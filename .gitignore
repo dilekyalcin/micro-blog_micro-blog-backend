@@ -1,4 +1,5 @@
-backend/.venv
-backend/models/__pycache__
-backend/routes/__pycache__
+.gitignore
+backend/.venv/
+backend/models/__pycache__/
+backend/routes/__pycache__/
 backend/config.json
