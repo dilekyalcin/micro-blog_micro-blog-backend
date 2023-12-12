@@ -1,6 +1,6 @@
 from mongoengine import Document, StringField, DateTimeField, ListField, ReferenceField
-from Users import Users
-from Post import Post 
+from models.users import Users
+from models.post import Post 
 
 class Comment(Document):
     content = StringField(required=True)

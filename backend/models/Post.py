@@ -1,5 +1,5 @@
 from mongoengine import Document, StringField, DateTimeField, ListField, ReferenceField
-from Users import Users  
+from models.users import Users  
 
 class Post(Document):
     title = StringField(required=True)
