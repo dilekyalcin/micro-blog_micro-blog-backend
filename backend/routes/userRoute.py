@@ -20,9 +20,6 @@ def add_user():
         bio=data['bio'],
         birthdate=datetime.datetime.strptime(data['birthdate'], '%Y-%m-%d') if 'birthdate' in data else None,
         created_at=datetime.datetime.now(),
-        posts=[],
-        liked_posts=[],
-        comments=[]
     )
 
     new_user.save()

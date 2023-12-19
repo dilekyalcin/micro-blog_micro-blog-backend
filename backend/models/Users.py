@@ -6,12 +6,24 @@ class Users(Document):
     firstname = StringField()
     lastname = StringField()
     username = StringField(required=True, unique=True)
-    password = StringField(required=True) 
+    password_hash = StringField(required=True)
+    password_salt = StringField(required=True) 
     email = EmailField(required=True, unique=True)
     bio = StringField(max_length=800)
     birthdate = DateTimeField()
     created_at = DateTimeField(default=datetime.datetime.now)
-    posts = ListField(ReferenceField('Post')) 
-    liked_posts = ListField(ReferenceField('Post')) 
-    comments = ListField(ReferenceField('Comment'))  
+    
 
+
+class UserRegisterDto:
+    def __init__(self, firstname, lastname, username, password, email):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.username = username
+        self.password = password
+        self.email = email
+
+class UserLoginDto:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password

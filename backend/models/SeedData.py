@@ -39,10 +39,10 @@ comment = Comment(
 comment.save()
 
 
-user.liked_posts.append(post)
-user.comments.append(comment)
-user.posts.append(post)
-post.likes.append(user)
-post.comments.append(comment)
-user.save()
-post.save()
+# user.liked_posts.append(post)
+# user.comments.append(comment)
+# user.posts.append(post)
+# post.likes.append(user)
+# post.comments.append(comment)
+# user.save()
+# post.save()

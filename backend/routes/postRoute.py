@@ -22,8 +22,6 @@ def add_post():
         content=data['content'],
         author=author,
         created_at=datetime.datetime.now(),
-        likes=[],
-        comments=[]
     )
 
     new_post.save()
