@@ -1,35 +1,29 @@
 from flask import Blueprint, request, jsonify
-from models.users import Users, UserLoginDto, UserRegisterDto
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from models.users import Users
+from flask_jwt_extended import create_access_token
 import hashlib
 import secrets
+
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    user_dto = UserRegisterDto(
-        firstname=data.get('firstname'),
-        lastname=data.get('lastname'),
-        username=data.get('username'),
-        password=data.get('password'),
-        email=data.get('email')
-    )
 
-    existing_user = Users.objects(username=user_dto.username).first()
+    existing_user = Users.objects(username=data.get('username')).first()
     if existing_user:
         return jsonify(message='Username is already taken!'), 400
 
-    password_salt, password_hash = create_password_hash(user_dto.password)
+    password_salt, password_hash = create_password_hash(data.get('password'))
 
     new_user = Users(
-        firstname=user_dto.firstname,
-        lastname=user_dto.lastname,
-        username=user_dto.username,
+       firstname=data.get('firstname'),
+        lastname=data.get('lastname'),
+        username=data.get('username'),
         password_salt=password_salt,
         password_hash=password_hash,
-        email=user_dto.email
+        email=data.get('email')
     )
     new_user.save()
 
@@ -38,31 +32,23 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user_dto = UserLoginDto(
-        username=data.get('username'),
-        password=data.get('password')
-    )
 
-    user = Users.objects(username=user_dto.username).first()
+    user = Users.objects(username=data.get('username')).first()
 
-    if user and verify_password_hash(user_dto.password, user.password_salt, user.password_hash):
-        access_token = create_access_token(identity=user_dto.username)
+    if user and verify_password_hash(data.get('password'), user.password_salt, user.password_hash):
+        access_token = create_access_token(identity=user)
         return jsonify(access_token=access_token, message='Login successful!'), 200
     else:
         return jsonify({'message': 'Invalid username or password!'}), 401
 
-@auth_bp.route('/get_users', methods=['GET'])
-@jwt_required()
-def get_users():
-    current_user = get_jwt_identity()
 
-    user = Users.objects(username=current_user).first()
-   
-    if user:
-        return jsonify({'username': user.username, 'email': user.email}), 200
-    else:
-        return jsonify({'message': 'User not found!'}), 404
-
+# @auth_bp.route('/logout', methods=['POST'])
+# @jwt_required()
+# def logout():
+#     jti = get_jwt()["jti"]
+#     token_blacklist = request.blueprint.token_blacklist
+#     token_blacklist.add(jti)
+#     return jsonify(message='Logged out successfully'), 200
 
 def create_password_hash(password):
     password_salt = secrets.token_hex(16)
