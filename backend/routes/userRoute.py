@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import secrets
 
+
 connect_to_mongodb()
 
 user_bp = Blueprint('user', __name__)

@@ -6,10 +6,10 @@ from models.post import Post
 from models.comment import Comment
 import datetime
 
+
 connect_to_mongodb()
 
 comment_bp = Blueprint('comment', __name__)
-
 
 @comment_bp.route("/add_comment", methods=['POST'])
 @jwt_required()
@@ -30,10 +30,9 @@ def add_comment():
         post=post,
         created_at=datetime.datetime.now()
     )
-
     new_comment.save()
-
     return {"message": 'Comment added.'}, 201
+
 
 
 @comment_bp.route("/delete_comment/<comment_id>", methods=['DELETE'])

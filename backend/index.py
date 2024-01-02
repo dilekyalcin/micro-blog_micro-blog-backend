@@ -30,17 +30,6 @@ def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return Users.objects.get(id=identity)
 
-
-# @jwt.token_in_blocklist_loader
-# def check_if_token_in_blacklist(decrypted_token, *args, **kwargs):
-#     try:
-#         jti = decrypted_token["jti"]
-#         return jti in token_blacklist
-#     except KeyError:
-#         # jti anahtarı bulunamadı
-#         return True
-
-# CORS(app)
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(post_bp, url_prefix='/post')
 app.register_blueprint(comment_bp, url_prefix='/comment')

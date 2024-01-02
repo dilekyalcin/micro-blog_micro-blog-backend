@@ -10,7 +10,7 @@ from mongoengine import DoesNotExist
 connect_to_mongodb()
 
 post_bp = Blueprint('post', __name__)
-    
+
 @post_bp.route('/add_post', methods=['POST'])
 @jwt_required()
 def add_post():
@@ -156,3 +156,4 @@ def get_posts_by_attribute():
         })
 
     return jsonify(result), 200
+
