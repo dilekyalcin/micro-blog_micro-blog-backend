@@ -6,7 +6,6 @@ class Users(Document):
     firstname = StringField()
     lastname = StringField()
     username = StringField(required=True, unique=True)
-    password = StringField()
     password_hash = StringField(required=True)
     password_salt = StringField(required=True) 
     email = EmailField(required=True, unique=True)

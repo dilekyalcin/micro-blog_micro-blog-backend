@@ -5,6 +5,7 @@ from models.users import Users
 from models.post import Post
 from models.comment import Comment
 import datetime
+from flask_cors import cross_origin
 
 connect_to_mongodb()
 
@@ -13,6 +14,7 @@ comment_bp = Blueprint('comment', __name__)
 
 @comment_bp.route("/add_comment", methods=['POST'])
 @jwt_required()
+@cross_origin()
 def add_comment():
   
     if not current_user:
@@ -38,6 +40,7 @@ def add_comment():
 
 @comment_bp.route("/delete_comment/<comment_id>", methods=['DELETE'])
 @jwt_required()
+@cross_origin()
 def delete_comment(comment_id):
 
     if not current_user:
@@ -54,6 +57,7 @@ def delete_comment(comment_id):
 
 @comment_bp.route("/update_comment/<comment_id>", methods=['PUT'])
 @jwt_required()
+@cross_origin()
 def update_comment(comment_id):
 
     if not current_user:
@@ -74,6 +78,7 @@ def update_comment(comment_id):
 
 @comment_bp.route("/get_all_comments", methods=['GET'])
 @jwt_required()
+@cross_origin()
 def get_all_comments():
     comments = Comment.objects().all()
 

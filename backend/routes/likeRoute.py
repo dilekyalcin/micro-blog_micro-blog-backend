@@ -4,6 +4,7 @@ from models.like import Like
 from models.post import Post 
 from models.users import Users 
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
+from flask_cors import cross_origin
 import datetime
 
 connect_to_mongodb()
@@ -12,6 +13,7 @@ like_bp = Blueprint('like', __name__)
 
 @like_bp.route("/add_like", methods=['POST', 'OPTIONS'])
 @jwt_required()
+@cross_origin()
 def add_like():
     
     if not  current_user:
@@ -31,11 +33,14 @@ def add_like():
     new_like = Like(user=current_user, post=post)
     new_like.save()
 
-    return {"message": "Post liked successfully."}, 201
+    like_count = Like.objects(post=post).count()
+
+    return {"message": "Post liked successfully.", "liked": True, "likeCount": like_count}, 201
 
 
 @like_bp.route("/remove_like", methods=['DELETE'])
 @jwt_required()
+@cross_origin()
 def remove_like():
     if not current_user:
         return {"error": 'User not found.'}, 404
@@ -57,6 +62,7 @@ def remove_like():
 
 @like_bp.route("/get_all_likes", methods=['GET'])
 @jwt_required()
+@cross_origin()
 def get_all_likes():
     likes = Like.objects().all()
 
