@@ -35,10 +35,10 @@ def register():
 @cross_origin()
 def login():
     data = request.get_json()
-    print('data: ', data)
 
     user = Users.objects(username=data.get('username')).first()
-    print('user: ', user)
+
+
     if user and verify_password_hash(data.get('password'), user.password_salt, user.password_hash):
         access_token = create_access_token(identity=user)
         return jsonify(access_token=access_token, message='Login successful!'), 200

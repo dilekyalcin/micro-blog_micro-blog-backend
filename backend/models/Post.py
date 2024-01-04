@@ -6,4 +6,3 @@ class Post(Document):
     content = StringField(required=True)
     author = ReferenceField(Users)  
     created_at = DateTimeField()
-

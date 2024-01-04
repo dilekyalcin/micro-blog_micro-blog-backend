@@ -10,6 +10,7 @@ import os
 app = Flask(__name__)
 jwt = JWTManager(app)
 CORS(app, resources={r'/*': { 'origins': 'http://localhost:5173'}})
+
 # token_blacklist = set()
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +32,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
     return Users.objects.get(id=identity)
 
 
+
 # @jwt.token_in_blocklist_loader
 # def check_if_token_in_blacklist(decrypted_token, *args, **kwargs):
 #     try:
@@ -40,14 +42,11 @@ def user_lookup_callback(_jwt_header, jwt_data):
 #         # jti anahtarı bulunamadı
 #         return True
 
-
-
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(post_bp, url_prefix='/post')
 app.register_blueprint(comment_bp, url_prefix='/comment')
 app.register_blueprint(like_bp, url_prefix='/like')
 app.register_blueprint(auth_bp, url_prefix='/auth')
-
 
 if __name__ == "__main__":
     app.run(debug = True)
