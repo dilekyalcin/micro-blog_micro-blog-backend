@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from models.users import Users
-# from flask_cors import CORS
+from flask_cors import CORS
 from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -9,6 +9,7 @@ import os
 
 app = Flask(__name__)
 jwt = JWTManager(app)
+CORS(app, resources={r'/*': { 'origins': 'http://localhost:5173'}})
 
 # token_blacklist = set()
 
@@ -29,6 +30,17 @@ def user_identity_lookup(user):
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return Users.objects.get(id=identity)
+
+
+
+# @jwt.token_in_blocklist_loader
+# def check_if_token_in_blacklist(decrypted_token, *args, **kwargs):
+#     try:
+#         jti = decrypted_token["jti"]
+#         return jti in token_blacklist
+#     except KeyError:
+#         # jti anahtarı bulunamadı
+#         return True
 
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(post_bp, url_prefix='/post')
