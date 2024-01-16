@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.users import Users
 from flask_jwt_extended import create_access_token
+from flask_cors import cross_origin
 import hashlib
 import secrets
 
@@ -8,6 +9,7 @@ import secrets
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
+@cross_origin()
 def register():
     data = request.get_json()
 
@@ -30,10 +32,12 @@ def register():
     return jsonify(message='Registration successful!'), 201
 
 @auth_bp.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     data = request.get_json()
 
     user = Users.objects(username=data.get('username')).first()
+
 
     if user and verify_password_hash(data.get('password'), user.password_salt, user.password_hash):
         access_token = create_access_token(identity=user)
