@@ -3,16 +3,20 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from models.dbContext import connect_to_mongodb
 from models.post import Post 
 from models.users import Users 
-import datetime
+from models.comment import Comment
+from models.like import Like
+from datetime import datetime 
+from flask_cors import cross_origin
 import json
 from mongoengine import DoesNotExist
 
 connect_to_mongodb()
 
 post_bp = Blueprint('post', __name__)
-
+    
 @post_bp.route('/add_post', methods=['POST'])
 @jwt_required()
+@cross_origin()
 def add_post():
     if not current_user:
         return jsonify({'message': 'User not found!'}), 404
@@ -42,6 +46,10 @@ def delete_post(post_id):
 
     if not post:
         return jsonify({'message': 'Post not found or you do not have permission to delete it!'}), 404
+    
+    Comment.objects(post=post).delete()
+
+    Like.objects(post=post).delete()
 
     post.delete()
 
@@ -156,4 +164,3 @@ def get_posts_by_attribute():
         })
 
     return jsonify(result), 200
-
