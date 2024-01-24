@@ -11,6 +11,7 @@ with open(config_file_path, 'r') as f:
 
 mongo_url = config_data.get("mongo_url")
 
+
 def connect_to_mongodb():
     mongo_uri = mongo_url
     connect(host=mongo_uri)
