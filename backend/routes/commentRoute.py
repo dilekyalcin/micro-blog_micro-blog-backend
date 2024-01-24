@@ -1,9 +1,9 @@
 from flask import Flask, request, Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
-from models.dbContext import connect_to_mongodb
-from models.users import Users
-from models.post import Post
-from models.comment import Comment
+from models.DbContext import connect_to_mongodb
+from models.Users import Users
+from models.Post import Post
+from models.Comment import Comment
 import datetime
 from flask_cors import cross_origin
 
