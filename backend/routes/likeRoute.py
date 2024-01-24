@@ -15,7 +15,15 @@ like_bp = Blueprint('like', __name__)
 @jwt_required()
 @cross_origin()
 def add_like():
-    
+    """
+    Adds a like to a post.
+
+    Validates user authentication, retrieves post information,
+    and adds a like associated with the current user.
+
+    Returns:
+        jsonify: A JSON response indicating the success or failure of the like addition.
+    """
     if not  current_user:
         return {"error": 'User not found.'}, 404
 
@@ -42,6 +50,14 @@ def add_like():
 @jwt_required()
 @cross_origin()
 def remove_like():
+    """
+    Removes a like from a post.
+
+    Validates user authentication and removes the like associated with the current user.
+
+    Returns:
+        jsonify: A JSON response indicating the success or failure of the like removal.
+    """
     if not current_user:
         return {"error": 'User not found.'}, 404
 
@@ -60,11 +76,12 @@ def remove_like():
     return {"message": "Like removed successfully."}, 200
 
 
-@like_bp.route("/get_all_likes", methods=['GET'])
+@like_bp.route("/get_all_likes/<post_id>", methods=['GET'])
 @jwt_required()
 @cross_origin()
-def get_all_likes():
-    likes = Like.objects().all()
+def get_likes_by_post(post_id):
+    
+    likes = Like.objects(post=post_id)
 
     result = []
 
@@ -73,6 +90,8 @@ def get_all_likes():
             'id': str(like.id),
             'author_username': like.user.username,
             'post': like.post.content,
+            'firstname' : like.user.firstname,
+            'lastname' : like.user.lastname
         })
 
     return jsonify(result), 200
