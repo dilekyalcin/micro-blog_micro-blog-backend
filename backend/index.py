@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from models.users import Users
+from models.Users import Users
 from flask_cors import CORS, cross_origin
 from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
