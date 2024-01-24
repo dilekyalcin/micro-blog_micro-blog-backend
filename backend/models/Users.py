@@ -12,3 +12,4 @@ class Users(Document):
     bio = StringField(max_length=800)
     birthdate = DateTimeField()
     created_at = DateTimeField(default=datetime.datetime.now)
+    
