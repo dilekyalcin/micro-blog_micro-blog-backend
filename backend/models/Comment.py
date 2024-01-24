@@ -1,6 +1,6 @@
 from mongoengine import Document, StringField, DateTimeField, ListField, ReferenceField
-from models.users import Users
-from models.post import Post 
+from models.Users import Users
+from models.Post import Post 
 
 
 class Comment(Document):
