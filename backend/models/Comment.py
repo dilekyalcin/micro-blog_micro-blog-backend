@@ -2,6 +2,7 @@ from mongoengine import Document, StringField, DateTimeField, ListField, Referen
 from models.users import Users
 from models.post import Post 
 
+
 class Comment(Document):
     content = StringField(required=True)
     author = ReferenceField(Users)

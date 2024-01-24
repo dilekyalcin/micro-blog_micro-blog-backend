@@ -1,7 +1,6 @@
 from mongoengine import Document, StringField, EmailField, DateTimeField, ListField, ReferenceField
 import datetime
 
-
 class Users(Document):
     firstname = StringField()
     lastname = StringField()
