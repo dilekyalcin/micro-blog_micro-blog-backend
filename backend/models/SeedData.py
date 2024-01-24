@@ -1,7 +1,7 @@
-from models.users import Users
-from models.post import Post
-from models.comment import Comment
-from models.dbContext import connect_to_mongodb
+from models.Users import Users
+from models.Post import Post
+from models.Comment import Comment
+from models.DbContext import connect_to_mongodb
 import datetime
 
 

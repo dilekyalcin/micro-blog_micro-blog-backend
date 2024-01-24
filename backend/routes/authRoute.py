@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.users import Users
+from models.Users import Users
 from flask_jwt_extended import create_access_token
 from flask_cors import cross_origin
 import hashlib
