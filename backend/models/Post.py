@@ -7,4 +7,3 @@ class Post(Document):
     author = ReferenceField(Users)  
     created_at = DateTimeField()
     # image_filename = StringField()
-
