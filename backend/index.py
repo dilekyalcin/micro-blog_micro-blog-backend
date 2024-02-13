@@ -9,15 +9,20 @@ import os
 
 app = Flask(__name__)
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
-config_file_path = os.path.join(current_directory, 'config.json')
+app.config['MONGO_URL'] = os.environ.get('MONGO_URL')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_BLACKLIST_ENABLED'] = os.environ.get('JWT_BLACKLIST_ENABLED')
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = os.environ.get('JWT_BLACKLIST_TOKEN_CHECKS')
+app.config['IMAGE_UPLOADS'] = os.environ.get('IMAGE_UPLOADS')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = int(os.environ.get('JWT_ACCESS_TOKEN_EXPIRES')) if os.environ.get('JWT_ACCESS_TOKEN_EXPIRES') else 3600
 
-with open(config_file_path, 'r') as f:
-    config_data = json.load(f)
-    for key, value in config_data.items():  
-        app.config[key] = value
-
-cors_resources = app.config.get('CORS_RESOURCES', {})
+cors_resources = {
+    r"/*": {
+        "origins": "http://localhost",
+        "supports_credentials": True
+    }
+}
 CORS(app, resources=cors_resources)
 
 
@@ -46,6 +51,10 @@ def check_if_token_in_blacklist(jwt_header, jwt_data):
 def logout():
     jti = get_jwt()['jti']
     token_blacklist.add(jti)
+
+    with open("logged_out_tokens.txt", "a") as file:
+        file.write(jti + "\n")
+        
     return jsonify({"msg": "Successfully logged out"}), 200
 
 app.register_blueprint(user_bp, url_prefix='/user')
@@ -56,4 +65,4 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

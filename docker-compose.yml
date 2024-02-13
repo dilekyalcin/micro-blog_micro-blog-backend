@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./micro-blog_micro-blog-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./micro-blog_micro-blog-frontend:/app
+    networks:
+      - blogapp
+
+  backend:
+    build: 
+      context: ./micro-blog_micro-blog-backend/backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./micro-blog_micro-blog-backend/backend:/app
+    environment:
+      - MONGO_URL=mongodb+srv://root:1234@cluster0.chl5nrw.mongodb.net/micro-blogDB?retryWrites=true&w=majority
+      - JWT_SECRET_KEY=dilek1405!?.
+      - SECRET_KEY=dilek125!.?
+      - JWT_BLACKLIST_ENABLED=true
+      - JWT_BLACKLIST_TOKEN_CHECKS=access,refresh
+      - IMAGE_UPLOADS=uploads
+      - JWT_ACCESS_TOKEN_EXPIRES=86400
+    networks:
+      - blogapp
+
+networks:
+  blogapp:
+    driver: bridge
