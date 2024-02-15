@@ -10,6 +10,8 @@ services:
       - ./micro-blog_micro-blog-frontend:/app
     networks:
       - blogapp
+    depends_on:
+      - backend
 
   backend:
     build: 
