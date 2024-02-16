@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 app.config['MONGO_URL'] = os.environ.get('MONGO_URL')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['JWT_BLACKLIST_ENABLED'] = os.environ.get('JWT_BLACKLIST_ENABLED')
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = os.environ.get('JWT_BLACKLIST_TOKEN_CHECKS')
 app.config['IMAGE_UPLOADS'] = os.environ.get('IMAGE_UPLOADS')

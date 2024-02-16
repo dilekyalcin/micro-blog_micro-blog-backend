@@ -21,9 +21,8 @@ services:
     volumes:
       - ./micro-blog_micro-blog-backend/backend:/app
     environment:
-      - MONGO_URL=mongodb+srv://root:1234@cluster0.chl5nrw.mongodb.net/micro-blogDB?retryWrites=true&w=majority
-      - JWT_SECRET_KEY=dilek1405!?.
-      - SECRET_KEY=dilek125!.?
+      - MONGO_URL=${MONGO_URL}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - JWT_BLACKLIST_ENABLED=true
       - JWT_BLACKLIST_TOKEN_CHECKS=access,refresh
       - IMAGE_UPLOADS=uploads
