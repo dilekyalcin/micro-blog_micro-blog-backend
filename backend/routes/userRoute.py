@@ -147,3 +147,22 @@ def search_users():
     ]
 
     return jsonify(users_list), 200
+
+
+@user_bp.route("/<username>/posts", methods=['GET'])
+@cross_origin()
+def get_user_posts(username):
+    # Fetch posts based on the username and return them as a JSON response
+    user = Users.objects(username=username).first()
+    if user:
+        posts = Post.objects(author=user)
+        posts_list = [
+            {
+                "title": post.title,
+                "content": post.content,
+            }
+            for post in posts
+        ]
+        return jsonify(posts_list), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
