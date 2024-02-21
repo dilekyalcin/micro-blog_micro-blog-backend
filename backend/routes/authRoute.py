@@ -53,10 +53,9 @@ def login():
         jsonify: A JSON response containing the access token and user information upon successful login.
     """
     data = request.get_json()
-    print('data: ', data)
 
     user = Users.objects(username=data.get('username')).first()
-    print('user: ', user)
+
     if user and verify_password_hash(data.get('password'), user.password_salt, user.password_hash):
         access_token = create_access_token(identity=user)
         return jsonify(access_token=access_token, userId=str(user.id), message='Login successful!'), 200
