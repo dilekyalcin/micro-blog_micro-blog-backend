@@ -43,7 +43,7 @@ def add_post():
 
     new_post.save()
 
-    return jsonify({"message": "Post added successfully!"}), 201
+    return jsonify({"message": "Post added successfully!","post_id": str(new_post.id)}), 201
 
 
 @post_bp.route("/delete_post/<post_id>", methods=["DELETE"])
