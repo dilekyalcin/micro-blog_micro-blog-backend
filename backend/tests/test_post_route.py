@@ -2,6 +2,16 @@ from routes.postRoute import Post
 from models.Users import Users
 from datetime import datetime
 
+def assert_post_fields(post):
+    assert 'id' in post
+    assert 'title' in post
+    assert 'content' in post
+    assert 'author' in post
+    assert 'firstname' in post
+    assert 'lastname' in post
+    assert 'likeCount' in post
+    assert 'likes' in post
+    assert 'created_at' in post
 
 def test_get_all_posts(client, dummy_user, logged_in_client, dummy_post, dummy_comment, dummy_like):
     response = client.get('/post/get_all_posts', headers=logged_in_client)
@@ -13,16 +23,7 @@ def test_get_all_posts(client, dummy_user, logged_in_client, dummy_post, dummy_c
     print("get all posts: ",posts)
 
     first_post = posts[0]
-
-    assert 'id' in first_post
-    assert 'title' in first_post
-    assert 'content' in first_post
-    assert 'author' in first_post
-    assert 'firstname' in first_post
-    assert 'lastname' in first_post
-    assert 'likeCount' in first_post
-    assert 'likes' in first_post
-    assert 'created_at' in first_post
+    assert_post_fields(first_post)
 
     
     expected_date = datetime.strftime(dummy_post.created_at, "%Y-%m-%d %H:%M:%S")
@@ -63,15 +64,7 @@ def test_get_currentuser_posts(client, dummy_user, logged_in_client, dummy_post,
     assert len(posts) > 0
 
     first_post = posts[0]
-    assert 'id' in first_post
-    assert 'title' in first_post
-    assert 'content' in first_post
-    assert 'author' in first_post
-    assert 'firstname' in first_post
-    assert 'lastname' in first_post
-    assert 'likeCount' in first_post
-    assert 'likes' in first_post
-    assert 'created_at' in first_post
+    assert_post_fields(first_post)
 
     assert first_post['author'] == dummy_user[0].username
 
