@@ -3,9 +3,9 @@ from models.Users import Users
 from flask_cors import CORS, cross_origin
 from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
+from models.db import connect_to_database
 import json
 import os
-
 
 app = Flask(__name__)
 
@@ -64,4 +64,6 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 
 
 if __name__ == "__main__":
+    # Connect to database
+    connect_to_database(app.config['MONGO_URL'])
     app.run(host='0.0.0.0', port=5000, debug=True)
