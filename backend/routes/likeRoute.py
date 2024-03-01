@@ -1,5 +1,4 @@
 from flask import Flask, request, Blueprint, jsonify
-from models.DbContext import connect_to_mongodb
 from models.like import Like
 from models.Post import Post 
 from models.Users import Users 
@@ -7,7 +6,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_cors import cross_origin
 import datetime
 
-connect_to_mongodb()
 
 like_bp = Blueprint('like', __name__)
 

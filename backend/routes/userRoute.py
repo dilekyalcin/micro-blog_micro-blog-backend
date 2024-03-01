@@ -1,5 +1,4 @@
 from flask import Flask, request, Blueprint, jsonify
-from models.DbContext import connect_to_mongodb
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from models.Users import Users 
 from models.Post import Post
@@ -8,7 +7,6 @@ import datetime
 import hashlib
 import secrets
 
-connect_to_mongodb()
 
 user_bp = Blueprint('user', __name__)
 
@@ -122,6 +120,7 @@ def get_user_profile():
 
 
 @user_bp.route("/search_users", methods=['GET'])
+@jwt_required()
 @cross_origin()
 def search_users():
     """

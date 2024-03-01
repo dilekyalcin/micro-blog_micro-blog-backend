@@ -1,6 +1,5 @@
 from flask import Flask, request, Blueprint, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
-from models.DbContext import connect_to_mongodb
 from models.Post import Post
 from models.Users import Users
 from models.Comment import Comment
@@ -9,9 +8,6 @@ from datetime import datetime
 from flask_cors import cross_origin
 from mongoengine import DoesNotExist
 
-
-
-connect_to_mongodb()
 
 post_bp = Blueprint("post", __name__)
 
@@ -43,7 +39,7 @@ def add_post():
 
     new_post.save()
 
-    return jsonify({"message": "Post added successfully!"}), 201
+    return jsonify({"message": "Post added successfully!","post_id": str(new_post.id)}), 201
 
 
 @post_bp.route("/delete_post/<post_id>", methods=["DELETE"])
@@ -142,7 +138,7 @@ def get_all_posts():
     """
     posts = Post.objects().all()
     result = []
-
+ 
     for post in posts:
         likes = Like.objects(post=post.id)
         likes_info = []
@@ -153,7 +149,7 @@ def get_all_posts():
             }
 
             likes_info.append(user_info)
-
+        
         result.append(
             {
                 "id": str(post.id),
@@ -214,10 +210,10 @@ def get_currentuser_posts():
     return jsonify(result), 200
 
 
-@post_bp.route("/get_posts_by_date", methods=["GET"])
+@post_bp.route("/get_posts_by_date/<start_date>/<end_date>", methods=["GET"])
 @jwt_required()
 @cross_origin()
-def get_posts_by_date():
+def get_posts_by_date(start_date, end_date):
     """
     Retrieves posts within a date range.
 
@@ -226,12 +222,9 @@ def get_posts_by_date():
     Returns:
         jsonify: A JSON response containing information about posts within the date range.
     """
-    start_date_str = request.args.get("start_date")
-    end_date_str = request.args.get("end_date")
-
     try:
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
         
     except ValueError:
         return jsonify({"message": "Invalid date format! Please use YYYY-MM-DD."}), 400
@@ -248,71 +241,6 @@ def get_posts_by_date():
                 "author": post.author.username,
                 "firstname" : post.author.firstname,
                 "lastname" : post.author.lastname,
-                "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            }
-        )
-
-    return jsonify(result), 200
-
-
-@post_bp.route("/get_posts_by_attribute", methods=["GET"])
-@jwt_required()
-@cross_origin()
-def get_posts_by_attribute():
-    """
-    Retrieves posts based on a specific attribute.
-
-    Validates user authentication and retrieves information about posts based on a specific attribute.
-
-    Returns:
-        jsonify: A JSON response containing information about posts based on the specified attribute.
-    """
-    attribute = request.args.get("attribute", "").lower()
-    value = request.args.get("value", "")
-
-    if attribute not in ["title", "content", "author", "created_at"]:
-        return (
-            jsonify(
-                {
-                    "message": "Invalid attribute! Please choose from title, content, author, or created_at."
-                }
-            ),
-            400,
-        )
-
-    posts = []
-
-    if attribute == "title":
-        posts = Post.objects(title=value).all()
-
-    if attribute == "created_at":
-        try:
-            value = datetime.datetime.strptime(value, "%Y-%m-%d")
-            posts = Post.objects(
-                created_at__gte=value, created_at__lt=value + datetime.timedelta(days=1)
-            ).all()
-        except ValueError:
-            return (
-                jsonify({"message": "Invalid date format! Please use YYYY-MM-DD."}),
-                400,
-            )
-
-    if attribute == "author":
-        try:
-            author = Users.objects.get(username=value)
-        except DoesNotExist:
-            return jsonify({"message": f"Author with username {value} not found."}), 404
-
-        posts = Post.objects(author=author).all()
-
-    result = []
-    for post in posts:
-        result.append(
-            {
-                "id": str(post.id),
-                "title": post.title,
-                "content": post.content,
-                "author": post.author.username,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )
