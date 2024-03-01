@@ -1,11 +1,7 @@
 from models.Users import Users
 from models.Post import Post
 from models.Comment import Comment
-from models.DbContext import connect_to_mongodb
 import datetime
-
-
-connect_to_mongodb()
 
 
 user = Users(
