@@ -14,7 +14,7 @@ def assert_post_fields(post):
     assert 'created_at' in post
 
 def test_get_all_posts(client, dummy_user, logged_in_client, dummy_post, dummy_comment, dummy_like):
-    response = client.get('/post/get_all_posts', headers=logged_in_client)
+    response = client.get('/post/all-posts', headers=logged_in_client)
     assert response.status_code == 200
 
     posts = response.json
@@ -35,7 +35,7 @@ def test_add_post(client, dummy_user, logged_in_client):
     'title': 'New Post Title',
     'content': 'New Post Content'
     }
-    response = client.post('/post/add_post', json=data1, headers=logged_in_client)
+    response = client.post('/post', json=data1, headers=logged_in_client)
     assert response.status_code == 201
     assert response.json["message"] == "Post added successfully!"
 
@@ -46,7 +46,7 @@ def test_update_post(client, dummy_user, logged_in_client, dummy_post):
         "content": "Updated Post Content"
     }
 
-    response = client.put(f'/post/update_post/{dummy_post.id}', json=update_data, headers=logged_in_client)
+    response = client.put(f'/post/{dummy_post.id}', json=update_data, headers=logged_in_client)
     assert response.status_code == 200
     assert response.json["message"] == "Post updated successfully!"
 
@@ -57,7 +57,7 @@ def test_update_post(client, dummy_user, logged_in_client, dummy_post):
  
 
 def test_get_currentuser_posts(client, dummy_user, logged_in_client, dummy_post, dummy_comment, dummy_like):
-    response = client.get('/post/get_currentuser_post', headers=logged_in_client)
+    response = client.get('/post/currentuser-post', headers=logged_in_client)
     assert response.status_code == 200
 
     posts = response.json
@@ -80,7 +80,7 @@ def test_get_posts_by_date(client, dummy_user, logged_in_client, dummy_post, dum
     end_date = datetime.strftime(dummy_post.created_at, "%Y-%m-%d")
 
 
-    response = client.get(f'/post/get_posts_by_date/{start_date}/{end_date}', headers=logged_in_client)
+    response = client.get(f'/post/posts-by-date/{start_date}/{end_date}', headers=logged_in_client)
     assert response.status_code == 200
 
     # Check if the returned data is correct
