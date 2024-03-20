@@ -12,7 +12,7 @@ from mongoengine import DoesNotExist
 post_bp = Blueprint("post", __name__)
 
 
-@post_bp.route("/add_post", methods=["POST"])
+@post_bp.route('', methods=["POST"])
 @jwt_required()
 @cross_origin()
 def add_post():
@@ -42,7 +42,7 @@ def add_post():
     return jsonify({"message": "Post added successfully!","post_id": str(new_post.id)}), 201
 
 
-@post_bp.route("/delete_post/<post_id>", methods=["DELETE"])
+@post_bp.route("/<post_id>", methods=["DELETE"])
 @jwt_required()
 @cross_origin()
 def delete_post(post_id):
@@ -82,7 +82,7 @@ def delete_post(post_id):
     return jsonify({"message": "Post deleted successfully!"}), 200
 
 
-@post_bp.route("/update_post/<post_id>", methods=["PUT"])
+@post_bp.route("/<post_id>", methods=["PUT"])
 @jwt_required()
 @cross_origin()
 def update_post(post_id):
@@ -123,7 +123,7 @@ def update_post(post_id):
     return jsonify({"message": "Post updated successfully!"}), 200
 
 
-@post_bp.route("/get_all_posts", methods=["GET"])
+@post_bp.route("/all-posts", methods=["GET"])
 @jwt_required()
 @cross_origin()
 def get_all_posts():
@@ -167,7 +167,7 @@ def get_all_posts():
     return jsonify(result), 200
 
 
-@post_bp.route("/get_currentuser_post", methods=["GET"])
+@post_bp.route("/currentuser-post", methods=["GET"])
 @jwt_required()
 @cross_origin()
 def get_currentuser_posts():
@@ -210,7 +210,7 @@ def get_currentuser_posts():
     return jsonify(result), 200
 
 
-@post_bp.route("/get_posts_by_date/<start_date>/<end_date>", methods=["GET"])
+@post_bp.route("/posts-by-date/<start_date>/<end_date>", methods=["GET"])
 @jwt_required()
 @cross_origin()
 def get_posts_by_date(start_date, end_date):

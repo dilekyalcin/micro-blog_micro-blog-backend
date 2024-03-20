@@ -10,7 +10,7 @@ import secrets
 
 user_bp = Blueprint('user', __name__)
 
-@user_bp.route("/update_user", methods=['PUT'])
+@user_bp.route('', methods=['PUT'])
 @jwt_required()
 @cross_origin()
 def update_user():
@@ -64,7 +64,7 @@ def create_password_hash(password):
     
     return password_salt, password_hash
 
-@user_bp.route("/get_user_info", methods=['GET'])
+@user_bp.route("/user-info", methods=['GET'])
 @jwt_required()
 @cross_origin()
 def get_user_info():
@@ -85,7 +85,7 @@ def get_user_info():
     else:
         return jsonify({"error": "User not found"}), 404
 
-@user_bp.route("/get_user_profile", methods=['GET'])
+@user_bp.route("/user-profile", methods=['GET'])
 def get_user_profile():
     """
     Retrieves information about a specific user's profile.
@@ -119,7 +119,7 @@ def get_user_profile():
     return jsonify(user_profile), 200
 
 
-@user_bp.route("/search_users", methods=['GET'])
+@user_bp.route("/search-users", methods=['GET'])
 @jwt_required()
 @cross_origin()
 def search_users():

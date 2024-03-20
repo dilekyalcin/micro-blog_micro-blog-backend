@@ -9,7 +9,7 @@ import datetime
 
 like_bp = Blueprint('like', __name__)
 
-@like_bp.route("/add_like", methods=['POST', 'OPTIONS'])
+@like_bp.route('', methods=['POST', 'OPTIONS'])
 @jwt_required()
 @cross_origin()
 def add_like():
@@ -44,7 +44,7 @@ def add_like():
     return {"message": "Post liked successfully.", "liked": True, "likeCount": like_count}, 201
 
 
-@like_bp.route("/remove_like", methods=['DELETE'])
+@like_bp.route('', methods=['DELETE'])
 @jwt_required()
 @cross_origin()
 def remove_like():
@@ -74,7 +74,7 @@ def remove_like():
     return {"message": "Like removed successfully."}, 200
 
 
-@like_bp.route("/get_all_likes/<post_id>", methods=['GET'])
+@like_bp.route("/all-likes/<post_id>", methods=['GET'])
 @jwt_required()
 @cross_origin()
 def get_likes_by_post(post_id):

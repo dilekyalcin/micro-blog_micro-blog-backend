@@ -11,7 +11,7 @@ def test_update_user(client, dummy_user, logged_in_client):
         "password": "new_password123",
     }
 
-    response = client.put("/user/update_user", json=new_data, headers=logged_in_client)
+    response = client.put("/user", json=new_data, headers=logged_in_client)
     assert response.status_code == 200
     assert response.json == {"message": "User updated."}
 
@@ -39,7 +39,7 @@ def test_update_user(client, dummy_user, logged_in_client):
 
 
 def test_get_user_info(client, dummy_user,logged_in_client):
-    response = client.get('/user/get_user_info', headers=logged_in_client)
+    response = client.get('/user/user-info', headers=logged_in_client)
     assert response.status_code == 200
 
     user_info = response.json
@@ -48,7 +48,7 @@ def test_get_user_info(client, dummy_user,logged_in_client):
 
 def test_get_user_profile(client, dummy_user, dummy_post):
     # existing username
-    response = client.get(f'/user/get_user_profile?username={dummy_user[0].username}')
+    response = client.get(f'/user/user-profile?username={dummy_user[0].username}')
     assert response.status_code == 200
 
     user_profile = response.json
@@ -58,13 +58,13 @@ def test_get_user_profile(client, dummy_user, dummy_post):
     assert user_profile['posts'][0]['content'] == dummy_post.content
 
     # non-existing username
-    response = client.get('/user/get_user_profile?username=non_existing_user')
+    response = client.get('/user/user-profile?username=non_existing_user')
     assert response.status_code == 404
     assert response.json['message'] == 'User not found'
 
 
 def test_search_users(client, dummy_user, logged_in_client):
-    response = client.get('/user/search_users', headers=logged_in_client)
+    response = client.get('/user/search-users', headers=logged_in_client)
     assert response.status_code == 200
 
     users_list = response.json
@@ -88,7 +88,7 @@ def test_get_user_posts(client, dummy_user, dummy_post):
     assert user_posts[0]['content'] == dummy_post.content
 
     # non-existing username
-    response = client.get('/user/non_existing_user/posts')
+    response = client.get('/user/non-existing-user/posts')
     assert response.status_code == 404
     assert response.json['error'] == 'User not found'
 
