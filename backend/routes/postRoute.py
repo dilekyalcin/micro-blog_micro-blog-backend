@@ -123,48 +123,47 @@ def update_post(post_id):
     return jsonify({"message": "Post updated successfully!"}), 200
 
 
-@post_bp.route("/all-posts", methods=["GET"])
+@post_bp.route('/following-posts', methods=['GET'])
 @jwt_required()
 @cross_origin()
-def get_all_posts():
+def get_following_posts():
     """
-    Retrieves all posts.
+    Retrieves posts from users that the current user is following.
 
-    Validates user authentication and retrieves information about all posts,
-    including their authors, likes, and creation timestamps.
+    Validates user authentication and retrieves posts from users that the current user is following.
 
     Returns:
-        jsonify: A JSON response containing information about all posts.
+        jsonify: A JSON response containing the posts from users that the current user is following.
     """
-    posts = Post.objects().all()
-    result = []
- 
-    for post in posts:
-        likes = Like.objects(post=post.id)
-        likes_info = []
-        for like in likes:
-            user_info = {
-                "user_id": str(like.user.id),
-                "username": like.user.username,
-            }
+    following_users = current_user.following
+    following_posts = []
 
-            likes_info.append(user_info)
-        
-        result.append(
-            {
+    for user in following_users:
+        posts = Post.objects(author=user)
+        for post in posts:
+            likes = Like.objects(post=post.id)
+            likes_info = []
+            for like in likes:
+                user_info = {
+                    "user_id": str(like.user.id),
+                    "username": like.user.username,
+                }
+
+                likes_info.append(user_info)
+
+            following_posts.append({
                 "id": str(post.id),
                 "title": post.title,
                 "content": post.content,
                 "author": post.author.username,
-                "firstname" : post.author.firstname,
-                "lastname" : post.author.lastname,
+                "firstname": post.author.firstname,
+                "lastname": post.author.lastname,
                 "likeCount": len(likes_info),
                 "likes": likes_info,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            }
-        )
+            })
 
-    return jsonify(result), 200
+    return jsonify(following_posts), 200
 
 
 @post_bp.route("/currentuser-post", methods=["GET"])

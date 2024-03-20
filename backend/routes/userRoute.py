@@ -165,3 +165,131 @@ def get_user_posts(username):
         return jsonify(posts_list), 200
     else:
         return jsonify({"error": "User not found"}), 404
+
+@user_bp.route('/follow/<username>', methods=['POST'])
+@jwt_required()
+@cross_origin()
+def follow_user(username):
+    """
+    Follows another user.
+
+    Validates user authentication and follows the specified user.
+
+    Args:
+        username (str): The username of the user to follow.
+
+    Returns:
+        jsonify: A JSON response indicating the success or failure of the follow operation.
+    """
+
+    user = Users.objects(username=username).first()
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    if current_user == username:
+        return jsonify({"message": "You cannot follow yourself."}), 400
+
+    if user in current_user.following:
+        return jsonify({"message": "You are already following this user."}), 400
+
+    current_user.following.append(user)
+    current_user.save()
+
+    user.followers.append(current_user)
+    user.save()
+
+    return jsonify({ "username": username }), 200
+@user_bp.route('/unfollow/<username>', methods=['POST'])
+@jwt_required()
+@cross_origin()
+def unfollow_user(username):
+    """
+    Unfollows another user.
+
+    Validates user authentication and unfollows the specified user.
+
+    Args:
+        username (str): The username of the user to unfollow.
+
+    Returns:
+        jsonify: A JSON response indicating the success or failure of the unfollow operation.
+    """
+
+    user_to_unfollow = Users.objects(username=username).first()
+    if not user_to_unfollow:
+        return jsonify({"message": "User not found."}), 404
+
+    current_user_id = get_jwt_identity()
+    current_user = Users.objects(id=current_user_id).first()
+    if not current_user:
+        return jsonify({"message": "User not found."}), 404
+
+    if current_user == user_to_unfollow:
+        return jsonify({"message": "You cannot unfollow yourself."}), 400
+    
+    print(current_user)
+    print("following: ", current_user.following)
+
+    for f in current_user.following:
+        if f.username == username:
+            current_user.following.remove(user_to_unfollow)
+            user_to_unfollow.followers.remove(current_user)
+            current_user.save()
+            user_to_unfollow.save()
+            return jsonify({"message": "Unfollowed user successfully."}), 200
+        else:
+            return jsonify({"message": "You are not following this user."}), 400
+
+
+@user_bp.route('/<username>/following', methods=['GET'])
+@jwt_required()
+@cross_origin()
+def get_user_following(username):
+    """
+    Get the list of users that the specified user is following.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - "following": A list of usernames that the user is following.
+            - "count": The total count of users the user is following.
+
+    """
+    user = Users.objects(username=username).first()
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    following_users = user.following
+    following_usernames = [following_user.username for following_user in following_users]
+
+    return jsonify({"following": following_usernames, "count": len(following_users)}), 200
+
+
+@user_bp.route('/<username>/followers', methods=['GET'])
+@jwt_required()
+@cross_origin()
+def get_user_followers(username):
+    """
+    Get the list of users who are following the specified user.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - "followers": A list of usernames of users who are following the user.
+            - "count": The total count of followers of the user.
+
+    """
+    user = Users.objects(username=username).first()
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+    followers = user.followers
+    follower_usernames = [follower.username for follower in followers]
+
+    return jsonify({"followers": follower_usernames, "count": len(followers)}), 200
+
+
