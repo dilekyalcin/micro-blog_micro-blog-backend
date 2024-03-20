@@ -6,56 +6,12 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_cors import cross_origin
 import datetime
 
-
 like_bp = Blueprint('like', __name__)
 
-@like_bp.route('', methods=['POST', 'OPTIONS'])
+@like_bp.route('/managed-like', methods=['POST', 'DELETE'])
 @jwt_required()
 @cross_origin()
-def add_like():
-    """
-    Adds a like to a post.
-
-    Validates user authentication, retrieves post information,
-    and adds a like associated with the current user.
-
-    Returns:
-        jsonify: A JSON response indicating the success or failure of the like addition.
-    """
-    if not  current_user:
-        return {"error": 'User not found.'}, 404
-
-    data = request.get_json()
-
-    post = Post.objects(id=data['post_id']).first()
-
-    if not post:
-        return {"error": 'Post not found.'}, 404
-
-    existing_like = Like.objects(user=current_user, post=post).first()
-    if existing_like:
-        return {"message": "User already liked this post."}, 200
-
-    new_like = Like(user=current_user, post=post)
-    new_like.save()
-
-    like_count = Like.objects(post=post).count()
-
-    return {"message": "Post liked successfully.", "liked": True, "likeCount": like_count}, 201
-
-
-@like_bp.route('', methods=['DELETE'])
-@jwt_required()
-@cross_origin()
-def remove_like():
-    """
-    Removes a like from a post.
-
-    Validates user authentication and removes the like associated with the current user.
-
-    Returns:
-        jsonify: A JSON response indicating the success or failure of the like removal.
-    """
+def manage_like():
     if not current_user:
         return {"error": 'User not found.'}, 404
 
@@ -66,12 +22,34 @@ def remove_like():
         return {"error": 'Post not found.'}, 404
 
     existing_like = Like.objects(user=current_user, post=post).first()
-    if not existing_like:
-        return {"message": "User has not liked this post."}, 200
 
-    existing_like.delete()
+    if request.method == 'POST':
+        if existing_like:
+            return {"message": "User already liked this post."}, 200
 
-    return {"message": "Like removed successfully."}, 200
+        new_like = Like(user=current_user, post=post)
+        new_like.save()
+
+        tag = post.tag
+        tag.count += 1
+        tag.save()
+
+        like_count = Like.objects(post=post).count()
+
+        return {"message": "Post liked successfully.", "liked": True, "likeCount": like_count}, 201
+
+    elif request.method == 'DELETE': 
+        if not existing_like:
+            return {"message": "User has not liked this post."}, 200
+
+        existing_like.delete()
+
+        tag = post.tag
+        tag.count -= 1
+        tag.save()
+
+        return {"message": "Like removed successfully."}, 200
+
 
 
 @like_bp.route("/all-likes/<post_id>", methods=['GET'])

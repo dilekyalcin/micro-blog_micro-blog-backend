@@ -2,11 +2,12 @@ from flask import Flask, request, Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from models.Users import Users 
 from models.Post import Post
+from models.like import Like
 from flask_cors import cross_origin
 import datetime
 import hashlib
 import secrets
-
+from mongoengine.queryset.visitor import Q
 
 user_bp = Blueprint('user', __name__)
 
@@ -118,7 +119,6 @@ def get_user_profile():
 
     return jsonify(user_profile), 200
 
-
 @user_bp.route("/search-users", methods=['GET'])
 @jwt_required()
 @cross_origin()
@@ -130,8 +130,14 @@ def search_users():
         jsonify: A JSON response containing information about users matching the search query.
     """
     search_query = request.args.get('query', '')
+    current_user_id = get_jwt_identity()
 
-    similar_users = Users.objects(firstname__icontains=search_query)
+    similar_users = Users.objects(
+        (Q(firstname__icontains=search_query) |
+         Q(lastname__icontains=search_query) |
+         Q(username=search_query)) &
+        Q(id__ne=current_user_id)
+    )
 
     users_list = [
         {
@@ -147,24 +153,38 @@ def search_users():
 
     return jsonify(users_list), 200
 
-
 @user_bp.route("/<username>/posts", methods=['GET'])
+@jwt_required()
 @cross_origin()
 def get_user_posts(username):
-    # Fetch posts based on the username and return them as a JSON response
     user = Users.objects(username=username).first()
     if user:
         posts = Post.objects(author=user)
         posts_list = [
             {
+                "id": str(post.id),
                 "title": post.title,
+                "author": post.author.username,
+                "firstname" : post.author.firstname,
+                "lastname" : post.author.lastname,
                 "content": post.content,
+                "likeCount": len(Like.objects(post=post.id)),
+                "likes": [
+                    {
+                        "user_id": str(like.user.id),
+                        "username": like.user.username,
+                    }
+                    for like in Like.objects(post=post.id)
+                ],
+                "tag": post.tag.tag_name if post.tag else None,
+                "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
             for post in posts
         ]
         return jsonify(posts_list), 200
     else:
         return jsonify({"error": "User not found"}), 404
+
 
 @user_bp.route('/follow/<username>', methods=['POST'])
 @jwt_required()
@@ -242,21 +262,8 @@ def unfollow_user(username):
 
 
 @user_bp.route('/<username>/following', methods=['GET'])
-@jwt_required()
 @cross_origin()
 def get_user_following(username):
-    """
-    Get the list of users that the specified user is following.
-
-    Args:
-        username (str): The username of the user.
-
-    Returns:
-        dict: A dictionary containing the following information:
-            - "following": A list of usernames that the user is following.
-            - "count": The total count of users the user is following.
-
-    """
     user = Users.objects(username=username).first()
     if not user:
         return jsonify({"message": "User not found."}), 404
@@ -266,23 +273,9 @@ def get_user_following(username):
 
     return jsonify({"following": following_usernames, "count": len(following_users)}), 200
 
-
 @user_bp.route('/<username>/followers', methods=['GET'])
-@jwt_required()
 @cross_origin()
 def get_user_followers(username):
-    """
-    Get the list of users who are following the specified user.
-
-    Args:
-        username (str): The username of the user.
-
-    Returns:
-        dict: A dictionary containing the following information:
-            - "followers": A list of usernames of users who are following the user.
-            - "count": The total count of followers of the user.
-
-    """
     user = Users.objects(username=username).first()
     if not user:
         return jsonify({"message": "User not found."}), 404
@@ -291,5 +284,4 @@ def get_user_followers(username):
     follower_usernames = [follower.username for follower in followers]
 
     return jsonify({"followers": follower_usernames, "count": len(followers)}), 200
-
 

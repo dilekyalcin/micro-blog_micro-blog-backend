@@ -4,6 +4,7 @@ from models.Post import Post
 from models.Users import Users
 from models.Comment import Comment
 from models.like import Like
+from models.Tag import Tags
 from datetime import datetime
 from flask_cors import cross_origin
 from mongoengine import DoesNotExist
@@ -29,12 +30,16 @@ def add_post():
         return jsonify({"message": "User not found!"}), 404
 
     data = request.get_json()
+    tag_id = data.get("tag_id")
+
+    tag = Tags.objects(id=tag_id).first()
 
     new_post = Post(
         title=data.get("title"),
         content=data.get("content"),
         author=current_user["id"],
         created_at=datetime.now(),
+        tag =tag
     )
 
     new_post.save()
@@ -141,6 +146,7 @@ def get_following_posts():
     for user in following_users:
         posts = Post.objects(author=user)
         for post in posts:
+            tag = post.tag.tag_name if post.tag else None
             likes = Like.objects(post=post.id)
             likes_info = []
             for like in likes:
@@ -160,10 +166,12 @@ def get_following_posts():
                 "lastname": post.author.lastname,
                 "likeCount": len(likes_info),
                 "likes": likes_info,
+                "tag": tag,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             })
 
     return jsonify(following_posts), 200
+
 
 
 @post_bp.route("/currentuser-post", methods=["GET"])
@@ -192,6 +200,7 @@ def get_currentuser_posts():
             }
 
             likes_info.append(user_info)
+        tag = post.tag.tag_name if post.tag else None
         result.append(
             {
                 "id": str(post.id),
@@ -202,6 +211,7 @@ def get_currentuser_posts():
                 "content": post.content,
                 "likeCount": len(likes_info),
                 "likes": likes_info,
+                "tag": tag,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )
@@ -232,6 +242,16 @@ def get_posts_by_date(start_date, end_date):
 
     result = []
     for post in posts:
+        likes = Like.objects(post=post.id)
+        likes_info = []
+        for like in likes:
+            user_info = {
+                "user_id": str(like.user.id),
+                "username": like.user.username,
+            }
+
+            likes_info.append(user_info)
+        tag = post.tag.tag_name if post.tag else None
         result.append(
             {
                 "id": str(post.id),
@@ -240,6 +260,9 @@ def get_posts_by_date(start_date, end_date):
                 "author": post.author.username,
                 "firstname" : post.author.firstname,
                 "lastname" : post.author.lastname,
+                "likeCount": len(likes_info),
+                "likes": likes_info,
+                "tag": tag,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             }
         )
