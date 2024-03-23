@@ -169,9 +169,7 @@ def get_following_posts():
                 "tag": tag,
                 "created_at": post.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             })
-
     return jsonify(following_posts), 200
-
 
 
 @post_bp.route("/currentuser-post", methods=["GET"])
