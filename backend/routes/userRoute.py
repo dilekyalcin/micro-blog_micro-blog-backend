@@ -185,7 +185,6 @@ def get_user_posts(username):
     else:
         return jsonify({"error": "User not found"}), 404
 
-
 @user_bp.route('/follow/<username>', methods=['POST'])
 @jwt_required()
 @cross_origin()
@@ -259,8 +258,21 @@ def unfollow_user(username):
 
 
 @user_bp.route('/<username>/following', methods=['GET'])
+@jwt_required()
 @cross_origin()
 def get_user_following(username):
+    """
+    Get the list of users that the specified user is following.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - "following": A list of usernames that the user is following.
+            - "count": The total count of users the user is following.
+
+    """
     user = Users.objects(username=username).first()
     if not user:
         return jsonify({"message": "User not found."}), 404
@@ -270,9 +282,23 @@ def get_user_following(username):
 
     return jsonify({"following": following_usernames, "count": len(following_users)}), 200
 
+
 @user_bp.route('/<username>/followers', methods=['GET'])
+@jwt_required()
 @cross_origin()
 def get_user_followers(username):
+    """
+    Get the list of users who are following the specified user.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - "followers": A list of usernames of users who are following the user.
+            - "count": The total count of followers of the user.
+
+    """
     user = Users.objects(username=username).first()
     if not user:
         return jsonify({"message": "User not found."}), 404
@@ -281,4 +307,3 @@ def get_user_followers(username):
     follower_usernames = [follower.username for follower in followers]
 
     return jsonify({"followers": follower_usernames, "count": len(followers)}), 200
-
