@@ -41,10 +41,10 @@ def get_popular_tags():
     Returns:
         jsonify: A JSON response containing the most popular tags.
     """
-    all_tags = Tags.objects().order_by('-count')
+    all_tags = Tags.objects().order_by('-popularity_score')
     popular_tags = all_tags[:6]
 
-    tag_list = [{"tag_name": tag.tag_name, "count": tag.count} for tag in popular_tags]
+    tag_list = [{"tag_name": tag.tag_name, "count": tag.popularity_score} for tag in popular_tags]
     return jsonify(tag_list)
 
 @tag_bp.route('/<tag_name>', methods=['GET'])

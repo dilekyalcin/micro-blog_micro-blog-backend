@@ -31,7 +31,7 @@ def manage_like():
         new_like.save()
 
         tag = post.tag
-        tag.count += 1
+        tag.popularity_score += 1
         tag.save()
 
         like_count = Like.objects(post=post).count()
@@ -45,7 +45,7 @@ def manage_like():
         existing_like.delete()
 
         tag = post.tag
-        tag.count -= 1
+        tag.popularity_score -= 1
         tag.save()
 
         return {"message": "Like removed successfully."}, 200

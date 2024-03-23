@@ -246,9 +246,6 @@ def unfollow_user(username):
 
     if current_user == user_to_unfollow:
         return jsonify({"message": "You cannot unfollow yourself."}), 400
-    
-    print(current_user)
-    print("following: ", current_user.following)
 
     for f in current_user.following:
         if f.username == username:
