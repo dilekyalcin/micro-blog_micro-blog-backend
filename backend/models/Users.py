@@ -1,5 +1,6 @@
 from mongoengine import Document, StringField, EmailField, DateTimeField, ListField, ReferenceField
 import datetime
+import json
 
 class Users(Document):
     firstname = StringField()
@@ -11,4 +12,5 @@ class Users(Document):
     bio = StringField(max_length=800)
     birthdate = DateTimeField()
     created_at = DateTimeField(default=datetime.datetime.now)
-    
+    following = ListField(ReferenceField("Users")) 
+    followers = ListField(ReferenceField("Users")) 
