@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from models.Users import Users
 from flask_cors import CORS, cross_origin
-from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp
+from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp, tag_bp
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
 from models.db import connect_to_database
 import json
@@ -61,6 +61,7 @@ app.register_blueprint(post_bp, url_prefix='/post')
 app.register_blueprint(comment_bp, url_prefix='/comment')
 app.register_blueprint(like_bp, url_prefix='/like')
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(tag_bp, url_prefix='/tag')
 
 
 if __name__ == "__main__":
