@@ -1,5 +1,6 @@
 from models.Users import Users
 from routes.authRoute import create_password_hash, verify_password_hash
+import jwt
 
 def test_update_user(client, dummy_user, logged_in_client):
     new_data = {
@@ -63,24 +64,23 @@ def test_get_user_profile(client, dummy_user, dummy_post):
     assert response.json['message'] == 'User not found'
 
 
-def test_search_users(client, dummy_user, logged_in_client):
-    response = client.get('/user/search-users', headers=logged_in_client)
+def test_search_users(client, dummy_user, logged_in_client, dummy_user2):
+    response = client.get('/user/search-users?query=testuser2', headers=logged_in_client)
     assert response.status_code == 200
 
     users_list = response.json
     found = False
     for user in users_list:
-        if user['username'] == dummy_user[0].username:
+        if user['username'] == dummy_user2[0].username:
             found = True
-            assert found, f"User '{dummy_user[0].username}' found in search results"
+            assert found, f"User '{dummy_user2[0].username}' found in search results"
             break
 
-    assert found, f"User '{dummy_user[0].username}' not found in search results"
+    assert found, f"User '{dummy_user2[0].username}' not found in search results"
 
-
-def test_get_user_posts(client, dummy_user, dummy_post):
+def test_get_user_posts(client, dummy_user, logged_in_client, dummy_post):
     # existing username
-    response = client.get(f'/user/{dummy_user[0].username}/posts')
+    response = client.get(f'/user/{dummy_user[0].username}/posts', headers=logged_in_client)
     assert response.status_code == 200
 
     user_posts = response.json
@@ -88,8 +88,61 @@ def test_get_user_posts(client, dummy_user, dummy_post):
     assert user_posts[0]['content'] == dummy_post.content
 
     # non-existing username
-    response = client.get('/user/non-existing-user/posts')
+    response = client.get('/user/non-existing-user/posts', headers=logged_in_client)
     assert response.status_code == 404
     assert response.json['error'] == 'User not found'
 
+def test_follow_user(client, dummy_user, logged_in_client, dummy_user2):
+    response = client.post(f'/user/follow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 200
+    assert response.json == {"username": dummy_user2[0].username}
 
+    # Try to follow the same user again
+    response = client.post(f'/user/follow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 400
+    assert response.json == {"message": "You are already following this user."}
+
+    # Try to follow a non-existing user
+    response = client.post('/user/follow/non-existing-user', headers=logged_in_client)
+    assert response.status_code == 404
+    assert response.json == {"message": "User not found."}
+
+def test_unfollow_user(client, dummy_user, logged_in_client, dummy_user2):
+    # Follow the user first
+    response = client.post(f'/user/follow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 200
+    assert response.json == {"username": dummy_user2[0].username}
+
+    # Unfollow the user
+    response = client.post(f'/user/unfollow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 200
+    assert response.json == {"message": "Unfollowed user successfully."}
+
+    # Try to unfollow a non-existing user
+    response = client.post('/user/unfollow/non-existing-user', headers=logged_in_client)
+    assert response.status_code == 404
+    assert response.json == {"message": "User not found."}
+
+def test_get_user_following(client, dummy_user, dummy_user2, logged_in_client):
+    # Follow a user
+    response = client.post(f'/user/follow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 200
+
+    # Get the list of following users
+    response = client.get(f'/user/{dummy_user[0].username}/following', headers=logged_in_client)
+    assert response.status_code == 200
+
+    data = response.json
+    assert data['following'][0] == dummy_user2[0].username
+
+def test_get_user_followers(client, dummy_user, dummy_user2, logged_in_client, logged_in_client2):
+    # Follow a user
+    response = client.post(f'/user/follow/{dummy_user2[0].username}', headers=logged_in_client)
+    assert response.status_code == 200
+
+    # Get the list of followers
+    response = client.get(f'/user/{dummy_user2[0].username}/followers', headers=logged_in_client2)
+    assert response.status_code == 200
+
+    data = response.json
+    assert data['followers'][0] == dummy_user[0].username
