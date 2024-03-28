@@ -1,4 +1,4 @@
-from routes.authRoute import create_password_hash, verify_password_hash
+from routes.auth_route import create_password_hash, verify_password_hash
 from models.Users import Users
 import pytest
 

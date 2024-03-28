@@ -8,10 +8,10 @@ import datetime
 
 like_bp = Blueprint('like', __name__)
 
-@like_bp.route('/managed-like', methods=['POST', 'DELETE'])
+@like_bp.route('', methods=['POST', 'DELETE'])
 @jwt_required()
 @cross_origin()
-def manage_like():
+def like_unlike_post():
     if not current_user:
         return {"error": 'User not found.'}, 404
 

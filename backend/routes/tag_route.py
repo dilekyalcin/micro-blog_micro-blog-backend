@@ -8,10 +8,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 tag_bp = Blueprint('tag', __name__)
 
-@tag_bp.route('/managed-tags', methods=['GET', 'POST'])
+@tag_bp.route('', methods=['GET', 'POST'])
 @jwt_required()
 @cross_origin()
-def manage_tags():
+def get_and_add_tags():
     if request.method == 'GET':
         tags = Tags.objects()
         tag_list = [{'id': str(tag.id), 'name': tag.tag_name} for tag in tags]
