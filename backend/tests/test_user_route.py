@@ -1,5 +1,5 @@
 from models.Users import Users
-from routes.authRoute import create_password_hash, verify_password_hash
+from routes.auth_route import create_password_hash, verify_password_hash
 import jwt
 
 def test_update_user(client, dummy_user, logged_in_client):

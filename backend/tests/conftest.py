@@ -9,7 +9,7 @@ from mongoengine import connect, disconnect
 import mongomock
 from models.Users import Users
 import os
-from routes.authRoute import create_password_hash
+from routes.auth_route import create_password_hash
 from models.Post import Post
 from models.Comment import Comment
 from models.like import Like

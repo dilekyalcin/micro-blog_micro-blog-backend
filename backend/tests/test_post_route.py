@@ -1,4 +1,4 @@
-from routes.postRoute import Post
+from routes.post_route import Post
 from models.Users import Users
 from datetime import datetime
 

@@ -10,4 +10,3 @@ class Post(Document):
     created_at = DateTimeField()
     tag = ReferenceField(Tags)
     # image_filename = StringField()
-

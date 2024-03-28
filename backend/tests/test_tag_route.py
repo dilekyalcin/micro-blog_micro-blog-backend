@@ -1,6 +1,6 @@
-def test_manage_tags(client, dummy_user, logged_in_client, dummy_tag):
+def test_get_and_add_tags(client, dummy_user, logged_in_client, dummy_tag):
     # Test GET request to retrieve tags
-    response = client.get('/tag/managed-tags', headers=logged_in_client)
+    response = client.get('/tag', headers=logged_in_client)
     assert response.status_code == 200
     data = response.json
     assert isinstance(data, list)
@@ -9,21 +9,21 @@ def test_manage_tags(client, dummy_user, logged_in_client, dummy_tag):
 
     # Test adding a new tag
     tag_name = "New Tag"
-    response = client.post('/tag/managed-tags', json={"tag_name": tag_name}, headers=logged_in_client)
+    response = client.post('/tag', json={"tag_name": tag_name}, headers=logged_in_client)
     assert response.status_code == 201
     data = response.json
     assert "message" in data and "tag_id" in data
     assert data["message"] == "Tag added successfully"
 
     # Test adding an existing tag
-    response = client.post('/tag/managed-tags', json={"tag_name": dummy_tag.tag_name}, headers=logged_in_client)
+    response = client.post('/tag', json={"tag_name": dummy_tag.tag_name}, headers=logged_in_client)
     assert response.status_code == 400
     data = response.json
     assert "message" in data
     assert data["message"] == "Tag already exists"
 
     # Test adding a tag without providing a name
-    response = client.post('/tag/managed-tags', json={}, headers=logged_in_client)
+    response = client.post('/tag', json={}, headers=logged_in_client)
     assert response.status_code == 400
     data = response.json
     assert "message" in data
