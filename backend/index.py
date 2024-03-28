@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 from routes import user_bp, post_bp, comment_bp, like_bp, auth_bp, tag_bp
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
 from models.db import connect_to_database
+from models.token import Token  
 import json
 import os
 
@@ -37,8 +38,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     return Users.objects.get(id=identity)
 
-
-@jwt.token_in_blocklist_loader
+@jwt.token_in_blocklist_loader 
 def check_if_token_in_blacklist(jwt_header, jwt_data):
     jti = jwt_data["jti"]
     return jti in token_blacklist
@@ -51,10 +51,17 @@ def logout():
     jti = get_jwt()['jti']
     token_blacklist.add(jti)
 
-    with open("logged_out_tokens.txt", "a") as file:
-        file.write(jti + "\n")
-        
+    # Check tokens with the same JTI in the database
+    existing_token = Token.objects(jti=jti).first()
+    if existing_token:
+        return jsonify({"msg": "Token already exists"}), 400
+
+   # Save JTI to database
+    token = Token(jti=jti)
+    token.save()
+
     return jsonify({"msg": "Successfully logged out"}), 200
+
 
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(post_bp, url_prefix='/post')
